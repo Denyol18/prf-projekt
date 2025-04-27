@@ -13,8 +13,10 @@ async function seed() {
         await mongoose.connect(process.env.ATLAS_URI || '', { dbName: 'healthcare_data_manager' });
         console.log('MongoDB connected');
 
+        await User.deleteMany({});
         await Doctor.deleteMany({});
         await Patient.deleteMany({});
+        await Measurement.deleteMany({});
 
         const user_doc1 = await User.create({
             email: 'doktor1@klinika.hu',
