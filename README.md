@@ -17,7 +17,7 @@ npx ts-node src/seeder.ts
 npx ts-node src/app.ts
 ```
 Az első utasítás a szerveroldali függőségeket telepíti,
-a második rácsatlakozik az adatbázisra, kiüríti, feltölti azt demó adatokkal és végezetül megszakítja a kapcsolatot,
+a második rácsatlakozik az adatbázisra, kiüríti, majd feltölti azt demó adatokkal és végezetül megszakítja a kapcsolatot,
 a harmadik pedig ismét rácsatlakozik az adatbázisra és elindítja a szervert.
 
 A másik terminálban a "client" mappába navigálás után pedig ezeket hajtsd végre:
@@ -27,6 +27,6 @@ ng serve
 ```
 Az első utasítás a kliensoldali függőségeket telepíti, a második pedig helyben felépíti és kiszolgálja az alkalmazást.
 
-Az utasítások elvégzése után a programrendszer működőképes állapotba kerül és a http://localhost:4200/-on elérhetővé válik.
+Az utasítások elvégzése után a programrendszer működőképes állapotba kerül és a "http://localhost:4200/"-on elérhetővé válik.
 
 A \server\src-ben található seeder.ts-ben lévő demó páciensek és orvosok adatait felhasználhatod a kipróbálás során.
