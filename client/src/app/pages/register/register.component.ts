@@ -18,7 +18,7 @@ import {NgForOf, NgIf} from "@angular/common";
     <div class="register-container">
       <h2>Regisztráció páciensek számára</h2>
       <p>Kérjük, hogy minden mezőt töltsön ki!</p>
-      <p>Sikeres regisztrációt követően az oldal átírányítja Önt a bejelentkezés menübe.</p>
+      <p>Sikeres regisztrációt követően az oldal átirányítja Önt a bejelentkezés menübe.</p>
       <form #form="ngForm" (submit)="register(); $event.preventDefault()">
         <label>Név</label>
         <input type="text" [(ngModel)]="user.fullName" name="name" required minlength="3" #name="ngModel" />

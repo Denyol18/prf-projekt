@@ -27,6 +27,6 @@ ng serve
 ```
 Az első utasítás a kliensoldali függőségeket telepíti, a második pedig helyben felépíti és kiszolgálja az alkalmazást.
 
-Az utasítások elvégzése után a programrendszer működőképes állapotba kerül és a "http://localhost:4200/"-on elérhetővé válik.
+Az utasítások elvégzése után a programrendszer működőképes állapotba kerül és elérhetővé válik itt: http://localhost:4200/
 
 A \server\src-ben található seeder.ts-ben lévő demó páciensek és orvosok adatait felhasználhatod a kipróbálás során.
