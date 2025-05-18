@@ -67,7 +67,7 @@ async function seed() {
             birthDate: new Date('1995-01-01'),
             birthPlace: 'Szeged',
             phone: '36643765753',
-            doctorId: doctor2._id,
+            doctorId: doctor1._id,
         })
 
         const measurement1 = await Measurement.create({
