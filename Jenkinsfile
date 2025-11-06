@@ -1,7 +1,7 @@
 pipeline {
   agent any
   tools {
-    nodejs 'node22'
+    nodejs 'NodeJS 22'
   }
   environment {
     IMAGE_NAME = "prf-projekt"
