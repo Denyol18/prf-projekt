@@ -7,6 +7,7 @@ import authRoutes from './routes/auth';
 import patientRoutes from './routes/patient';
 import doctorRoutes from './routes/doctor';
 import measurementRoutes from './routes/measurement';
+import metrics from './metrics';
 
 import { authenticate } from './middleware/auth';
 
@@ -22,6 +23,11 @@ app.use('/api/auth', authRoutes);
 app.use('/api/patients', authenticate, patientRoutes);
 app.use('/api/doctors', doctorRoutes);
 app.use('/api/measurements', authenticate, measurementRoutes);
+
+app.get('/metrics', async (_req, res) => {
+    res.set('Content-Type', metrics.register.contentType);
+    res.end(await metrics.register.metrics());
+});
 
 mongoose.connect(process.env.ATLAS_URI || '', { dbName: 'healthcare_data_manager' })
     .then(() => {

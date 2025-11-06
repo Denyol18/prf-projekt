@@ -1,0 +1,24 @@
+services:
+  mongo:
+    image: mongo:latest
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: prf_db
+    ports:
+      - "27017:27017"
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    depends_on:
+      - mongo
+    ports:
+      - "3000:3000"
+    environment:
+      MONGO_URI: mongodb://mongo:27017/prf_db
+    restart: unless-stopped
+
+volumes:
+  mongo-data:
