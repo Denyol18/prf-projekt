@@ -48,14 +48,14 @@ pipeline {
         sh "docker build -f Dockerfile.server -t ${IMAGE_NAME}:${TAG} ."
       }
     }
-    stage('Push (optional)') {
-      when { expression { env.REGISTRY != '' } }
+    /*stage('Push (optional)') {
+      when { expression { return env.REGISTRY && env.REGISTRY.trim() != '' } }
       steps {
         // login and push to registry - left blank if local
         sh "docker tag ${IMAGE_NAME}:${TAG} ${REGISTRY}/${IMAGE_NAME}:${TAG}"
         sh "docker push ${REGISTRY}/${IMAGE_NAME}:${TAG}"
       }
-    }
+    }*/
     stage('Deploy (Terraform)') {
       steps {
         dir('terraform') {
