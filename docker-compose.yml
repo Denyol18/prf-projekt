@@ -1,24 +1,20 @@
 services:
-  mongo:
-    image: mongo:latest
-    restart: unless-stopped
-    volumes:
-      - mongo-data:/data/db
-    environment:
-      MONGO_INITDB_DATABASE: prf_db
-    ports:
-      - "27017:27017"
-  app:
+  server:
     build:
       context: .
       dockerfile: Dockerfile.server
-    depends_on:
-      - mongo
     ports:
       - "3000:3000"
     environment:
-      MONGO_URI: mongodb://mongo:27017/prf_db
+      JWT_SECRET: valami_nagyon_titkos_jelszo
+      ATLAS_URI: mongodb+srv://sprokdaniel:Jbt68TGnWczTYilq@prfcluster.bjw44kp.mongodb.net/healthcare_data_manager?retryWrites=true&w=majority&appName=PrfCluster
     restart: unless-stopped
-
-volumes:
-  mongo-data:
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile.client
+    ports:
+      - "4200:80"
+    depends_on:
+      - server
+    restart: unless-stopped
