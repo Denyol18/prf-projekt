@@ -2,6 +2,7 @@ pipeline {
   agent any
   tools {
     nodejs 'NodeJS 22'
+    terraform 'Terraform 1.13.5'
   }
   environment {
     IMAGE_NAME = "prf-projekt"
