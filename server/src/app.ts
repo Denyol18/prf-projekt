@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import { register, collectDefaultMetrics } from 'prom-client';
 
 import authRoutes from './routes/auth';
 import patientRoutes from './routes/patient';
@@ -12,11 +13,18 @@ import { authenticate } from './middleware/auth';
 
 dotenv.config();
 
+collectDefaultMetrics();
+
 const app = express();
 const port = 3000;
 
 app.use(cors());
 app.use(express.json());
+
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/patients', authenticate, patientRoutes);
