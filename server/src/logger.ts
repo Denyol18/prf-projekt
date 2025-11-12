@@ -19,7 +19,7 @@ const logger = winston.createLogger({
         winston.format.simple()
       ),
     }),
-    graylogTransport,
+    graylogTransport as any,
   ],
 });
 
