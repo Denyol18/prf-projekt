@@ -1,28 +1,20 @@
-import winston from "winston";
-import WinstonGraylog2 from "winston-graylog2";
+import * as winston from "winston";
+import * as WinstonGraylog2 from "winston-graylog2";
 
-const graylogTransport = new WinstonGraylog2({
+const options = {
   name: "Graylog",
   level: "info",
   graylog: {
     servers: [{ host: "graylog", port: 12201 }],
   },
   staticMeta: { service: "prf-server" },
-});
+};
+
+const graylog2Transport = new WinstonGraylog2(options);
 
 const logger = winston.createLogger({
-  level: "info",
-  transports: [
-    new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.simple(),
-		winston.format.metadata(),
-		winston.format.errors({ stack: true })
-      ),
-    }),
-    graylogTransport as any,
-  ],
+  exitOnError: false,
+  transports: [graylog2Transport]
 });
 
 export default logger;
