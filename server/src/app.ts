@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { register, collectDefaultMetrics, Counter, Histogram } from 'prom-client';
+import logger from './logger';
 
 import authRoutes from './routes/auth';
 import patientRoutes from './routes/patient';
@@ -56,6 +57,13 @@ app.use((req, res, next) => {
     httpRequestTotal
       .labels(req.method, req.path, res.statusCode.toString())
       .inc();
+	  
+	logger.info("HTTP Request", {
+      method: req.method,
+	  path: req.path,
+      statusCode: res.statusCode,
+      duration: duration.toFixed(3) + "s",
+    });
   });
 
   next();
