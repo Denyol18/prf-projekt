@@ -16,16 +16,23 @@ const graylogTransport = new WinstonGraylog2({
   staticMeta: { service: "prf-server" },
 });
 
-graylogTransport.on("error", (error) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const graylogEmitter = graylogTransport as any;
+
+graylogEmitter.on("error", (error: any) => {
   console.error("\x1b[31m[Graylog Transport Error]\x1b[0m", error.message);
 });
 
-graylogTransport.on("close", () => {
+graylogEmitter.on("close", () => {
   console.warn("\x1b[33m[Graylog Transport Closed]\x1b[0m");
 });
 
-graylogTransport.on("connect", () => {
-  console.log("\x1b[32m[Graylog Connected]\x1b[0m Sending logs to", GRAYLOG_HOST + ":" + GRAYLOG_PORT);
+graylogEmitter.on("connect", () => {
+  console.log("\x1b[32m[Graylog Connected]\x1b[0m Sending logs to graylog:12201");
+});
+
+graylogEmitter.on("message", (msg: any) => {
+  console.debug("\x1b[36m[Graylog Message Sent]\x1b[0m", msg.short_message || msg.message);
 });
 
 const logger = winston.createLogger({
