@@ -3,8 +3,8 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { register, collectDefaultMetrics, Counter, Histogram } from 'prom-client';
-import logger from './logger';
 
+import logger from './logger';
 import authRoutes from './routes/auth';
 import patientRoutes from './routes/patient';
 import doctorRoutes from './routes/doctor';

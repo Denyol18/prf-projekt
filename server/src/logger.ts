@@ -10,8 +10,6 @@ const graylogTransport = new WinstonGraylog2({
   graylog: {
     servers: [{ host: GRAYLOG_HOST, port: GRAYLOG_PORT }],
 	hostname: "prf_server",
-	facility: "prf_app",
-	bufferSize: 1400,
   },
   staticMeta: { service: "prf-server" },
 });
