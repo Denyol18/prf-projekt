@@ -2,14 +2,14 @@ import request from 'supertest';
 import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import User from '../src/models/User';
-import Patient from '../src/models/Patient';
-import Doctor from "../src/models/Doctor";
-import authRouter from '../src/routes/auth';
+import User from '../../src/models/User';
+import Patient from '../../src/models/Patient';
+import Doctor from "../../src/models/Doctor";
+import authRouter from '../../src/routes/auth';
 
-jest.mock('../src/models/User');
-jest.mock('../src/models/Patient');
-jest.mock('../src/models/Doctor');
+jest.mock('../../src/models/User');
+jest.mock('../../src/models/Patient');
+jest.mock('../../src/models/Doctor');
 
 const app = express();
 app.use(express.json());
@@ -57,7 +57,7 @@ describe('Auth Routes', () => {
         });
 
         it('should return 400 if an unexpected error occurs during registration', async () => {
-            (User.findOne as jest.Mock).mockRejectedValue(new Error('Database error'));
+            (User.findOne as jest.Mock).mockRejectedValue(new Error('Fail'));
 
             const res = await request(app)
                 .post('/auth/register')
@@ -102,11 +102,11 @@ describe('Auth Routes', () => {
         });
 
         it('should login a doctor and return a token', async () => {
-            const hashedPassword = await bcrypt.hash('password456', 10);
+            const hashedPassword = await bcrypt.hash('password123', 10);
 
             (User.findOne as jest.Mock).mockResolvedValue({
                 _id: 'user456',
-                email: 'test2@example.com',
+                email: 'doctor@example.com',
                 password: hashedPassword,
                 role: 'doctor',
             });
@@ -114,7 +114,7 @@ describe('Auth Routes', () => {
 
             const res = await request(app)
                 .post('/auth/login')
-                .send({ email: 'test2@example.com', password: 'password456' });
+                .send({ email: 'doctor@example.com', password: 'password123' });
 
             expect(res.status).toBe(200);
             expect(res.body.token).toBeDefined();
@@ -154,7 +154,7 @@ describe('Auth Routes', () => {
         });
 
         it('should return 500 if an unexpected error occurs during login', async () => {
-            (User.findOne as jest.Mock).mockRejectedValue(new Error('Database error'));
+            (User.findOne as jest.Mock).mockRejectedValue(new Error('Fail'));
 
             const res = await request(app)
                 .post('/auth/login')

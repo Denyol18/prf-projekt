@@ -1,9 +1,9 @@
 import request from 'supertest';
 import express from 'express';
-import doctorRouter from '../src/routes/doctor';
-import Doctor from '../src/models/Doctor';
+import Doctor from '../../src/models/Doctor';
+import doctorRouter from '../../src/routes/doctor';
 
-jest.mock('../src/models/Doctor');
+jest.mock('../../src/models/Doctor');
 
 const app = express();
 app.use(express.json());
@@ -34,7 +34,7 @@ describe('Doctor Routes', () => {
 
         it('should return 500 if an unexpected error occurs', async () => {
             (Doctor.find as jest.Mock).mockReturnValue({
-                select: jest.fn().mockRejectedValue(new Error('Database error')),
+                select: jest.fn().mockRejectedValue(new Error('Fail')),
             });
 
             const res = await request(app).get('/doctors');

@@ -1,8 +1,8 @@
 import express from 'express';
 import Patient from '../models/Patient';
-import {authenticate, AuthRequest} from '../middleware/auth';
 import User from "../models/User";
 import Measurement from '../models/Measurement';
+import { AuthRequest, authenticate } from '../middleware/auth';
 
 const router = express.Router();
 

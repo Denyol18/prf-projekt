@@ -75,7 +75,7 @@ router.get('/doctor', authenticate, async (req: AuthRequest, res) => {
 
         res.json(measurements);
     } catch (err) {
-        console.error('Nem sikerült lekérni a méréseket az orvos számára:', err);
+        //console.error('Nem sikerült lekérni a méréseket az orvos számára:', err);
         res.status(500).json({ error: 'Szerverhiba', details: err });
     }
 });
