@@ -3,14 +3,19 @@ import Patient from '../models/Patient';
 import User from "../models/User";
 import Measurement from '../models/Measurement';
 import { AuthRequest, authenticate } from '../middleware/auth';
+import { trackDbOperation } from '../app';
 
 const router = express.Router();
 
 router.get('/doctor', authenticate, async (req: AuthRequest, res) => {
     try {
         const doctorUserId = req.user?.userId;
-        const patients = await Patient.find({ doctorId: doctorUserId })
-            .populate('userId', 'email');
+        
+		const patients = await trackDbOperation(
+            'find',
+            'patients',
+            () => Patient.find({ doctorId: doctorUserId }).populate('userId', 'email')
+        );
 
         if (!patients.length) {
             res.status(404).json({ error: 'Orvosnak nincsenek páciensei' });
@@ -26,7 +31,11 @@ router.get('/doctor', authenticate, async (req: AuthRequest, res) => {
 router.get('/', authenticate, async (req: AuthRequest, res) => {
     try {
         const patientUserId = req.user?.userId;
-        const patient = await Patient.findOne({ _id: patientUserId });
+        const patient = await trackDbOperation(
+            'findOne',
+            'patients',
+            () => Patient.findOne({ _id: patientUserId })
+        );
 
         if (!patient) {
             res.status(404).json({ error: 'Páciens nem létezik' });
@@ -41,7 +50,11 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
 
 router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
     try {
-        const patient = await Patient.findById(req.user?.userId);
+        const patient = await trackDbOperation(
+            'findById',
+            'patients',
+            () => Patient.findById(req.user?.userId)
+        );
 
         if (!patient) {
             res.status(404).json({ error: 'Páciens nem létezik' });
@@ -54,9 +67,17 @@ router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
         }
         const patientId = patient.userId;
 
-        await Measurement.deleteMany({ patientId: req.params.id });
-        await Patient.findByIdAndDelete(req.params.id);
-        await User.findByIdAndDelete(patientId);
+        await trackDbOperation(
+            'deleteMany',
+            'measurements',
+            () => Measurement.deleteMany({ patientId: req.params.id })
+        );
+        await trackDbOperation('findByIdAndDelete', 'patients', () =>
+            Patient.findByIdAndDelete(req.params.id)
+        );
+        await trackDbOperation('findByIdAndDelete', 'users', () =>
+            User.findByIdAndDelete(patientId)
+        );
         res.json({ message: 'Páciens törölve' });
     } catch (err) {
         res.status(500).json({ error: 'Szerverhiba', details: err })
@@ -65,7 +86,11 @@ router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
 
 router.put('/:id', authenticate, async (req: AuthRequest, res) => {
     try {
-        const patient = await Patient.findById(req.user?.userId);
+        const patient = await trackDbOperation(
+            'findById',
+            'patients',
+            () => Patient.findById(req.user?.userId)
+        );
 
         if (!patient) {
             res.status(404).json({ error: 'Páciens nem létezik' });
@@ -84,7 +109,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res) => {
         patient.birthPlace = birthPlace || patient.birthPlace;
         patient.birthDate = birthDate || patient.birthDate;
 
-        await patient.save();
+        await trackDbOperation('save', 'patients', () => patient.save());
         res.json(patient);
     } catch (err) {
         res.status(500).json({ error: 'Szerverhiba', details: err });

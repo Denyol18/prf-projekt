@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import Patient from '../models/Patient';
 import Doctor from "../models/Doctor";
+import { trackDbOperation } from '../app';
 
 const router = express.Router();
 
@@ -11,7 +12,7 @@ router.post('/register', async (req, res) => {
     try {
         const { fullName, email, password, birthDate, birthPlace, phone, doctorId } = req.body;
 
-        const existingUser = await User.findOne({ email });
+        const existingUser = await trackDbOperation('findOne', 'users', () => User.findOne({ email }));
         if (existingUser) {
             res.status(400).json({ error: 'Az email már használatban van' });
             return;
@@ -25,7 +26,7 @@ router.post('/register', async (req, res) => {
             role: 'patient',
         });
 
-        await newUser.save();
+        await trackDbOperation('save', 'users', () => newUser.save());
 
         const newPatient = new Patient({
             userId: newUser._id,
@@ -36,7 +37,7 @@ router.post('/register', async (req, res) => {
             doctorId,
         });
 
-        await newPatient.save();
+        await trackDbOperation('save', 'patients', () => newPatient.save());
 
         res.status(201).json({ message: 'Páciens sikeresen regisztrálva' });
     } catch (err) {
@@ -47,7 +48,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
-        const user = await User.findOne({ email });
+        const user = await trackDbOperation('findOne', 'users', () => User.findOne({ email }));
         if (!user) {
             res.status(400).json({ error: 'A felhasználó nem létezik vagy nem adtál meg emailt' });
             return;
@@ -63,11 +64,11 @@ router.post('/login', async (req, res) => {
 
         if (user.role === 'patient') {
             const userId = user._id
-            user_type = await Patient.findOne({ userId })
+            user_type = await trackDbOperation('findOne', 'patients', () => Patient.findOne({ userId }));
         }
         else if (user.role === 'doctor') {
             const userId = user._id
-            user_type = await Doctor.findOne({ userId })
+            user_type = await trackDbOperation('findOne', 'doctors', () => Doctor.findOne({ userId }));
         }
 
         const token = jwt.sign(

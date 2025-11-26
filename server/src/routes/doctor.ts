@@ -1,12 +1,16 @@
 import express from 'express';
 import Doctor from '../models/Doctor';
+import { trackDbOperation } from '../app';
 
 const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const doctors = await Doctor.find()
-            .select('_id fullName');
+        const doctors = await trackDbOperation(
+            'find',
+            'doctors',
+            () => Doctor.find().select('_id fullName')
+        );
 
         res.json(doctors);
     } catch (err) {

@@ -2,6 +2,7 @@ import express from 'express';
 import Measurement from '../models/Measurement';
 import Patient from '../models/Patient';
 import { AuthRequest, authenticate } from '../middleware/auth';
+import { trackDbOperation } from '../app';
 
 const router = express.Router();
 
@@ -12,14 +13,21 @@ router.get('/', async (req: AuthRequest, res) => {
     }
 
     try {
-        const patient = await Patient.findOne({ _id: req.user.userId });
+        const patient = await trackDbOperation(
+            'findOne',
+            'patients',
+            () => Patient.findOne({ _id: req.user?.userId })
+        );
         if (!patient) {
             res.status(404).json({ error: 'Páciens nem létezik' });
             return;
         }
 
-        const measurements = await Measurement.find({ patientId: patient._id })
-            .sort({ date : -1 });
+        const measurements = await trackDbOperation(
+            'find',
+            'measurements',
+            () => Measurement.find({ patientId: patient._id }).sort({ date: -1 })
+        );
 
         res.json(measurements);
     } catch (err) {
@@ -34,7 +42,11 @@ router.post('/', async (req: AuthRequest, res) => {
     }
 
     try {
-        const patient = await Patient.findOne({ _id: req.user.userId });
+        const patient = await trackDbOperation(
+            'findOne',
+            'patients',
+            () => Patient.findOne({ _id: req.user?.userId })
+        );
         if (!patient) {
             res.status(404).json({ error: 'Páciens nem létezik' });
             return;
@@ -50,7 +62,7 @@ router.post('/', async (req: AuthRequest, res) => {
             bloodSugar,
         });
 
-        await newMeasurement.save();
+        await trackDbOperation('save', 'measurements', () => newMeasurement.save());
         res.status(201).json(newMeasurement);
     } catch (err) {
         res.status(400).json({ error: 'Nem sikerült az új mérés hozzáadása', details: err });
@@ -61,7 +73,11 @@ router.get('/doctor', authenticate, async (req: AuthRequest, res) => {
     try {
         const doctorUserId = req.user?.userId;
 
-        const patients = await Patient.find({ doctorId: doctorUserId });
+        const patients = await trackDbOperation(
+            'find',
+            'patients',
+            () => Patient.find({ doctorId: doctorUserId })
+        );
 
         if (!patients.length) {
             res.json([]);
@@ -69,9 +85,14 @@ router.get('/doctor', authenticate, async (req: AuthRequest, res) => {
         }
 
         const patientIds = patients.map(p => p._id);
-        const measurements = await Measurement.find({ patientId: { $in: patientIds } })
-            .populate('patientId', 'fullName')
-            .sort({ date : -1 });
+        const measurements = await trackDbOperation(
+            'find',
+            'measurements',
+            () =>
+                Measurement.find({ patientId: { $in: patientIds } })
+                    .populate('patientId', 'fullName')
+                    .sort({ date: -1 })
+        );
 
         res.json(measurements);
     } catch (err) {
@@ -82,7 +103,11 @@ router.get('/doctor', authenticate, async (req: AuthRequest, res) => {
 
 router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
     try {
-        const measurement = await Measurement.findById(req.params.id);
+        const measurement = await trackDbOperation(
+            'findById',
+            'measurements',
+            () => Measurement.findById(req.params.id)
+        );
         if (!measurement) {
             res.status(404).json({ error: 'Mérés nem található' });
             return;
@@ -93,7 +118,11 @@ router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
             return;
         }
 
-        await Measurement.findByIdAndDelete(req.params.id);
+        await trackDbOperation(
+            'findByIdAndDelete',
+            'measurements',
+            () => Measurement.findByIdAndDelete(req.params.id)
+        );
         res.json({ message: 'Mérés törölve' });
     } catch (err) {
         res.status(500).json({ error: 'Szerverhiba', details: err });
@@ -102,7 +131,11 @@ router.delete('/:id', authenticate, async (req: AuthRequest, res) => {
 
 router.put('/:id', authenticate, async (req: AuthRequest, res) => {
     try {
-        const measurement = await Measurement.findById(req.params.id);
+        const measurement = await trackDbOperation(
+            'findById',
+            'measurements',
+            () => Measurement.findById(req.params.id)
+        );
         if (!measurement) {
             res.status(404).json({ error: 'Mérés nem található' });
             return;
@@ -121,7 +154,7 @@ router.put('/:id', authenticate, async (req: AuthRequest, res) => {
         measurement.weight = weight ?? measurement.weight;
         measurement.bloodSugar = bloodSugar ?? measurement.bloodSugar;
 
-        await measurement.save();
+        await trackDbOperation('save', 'measurements', () => measurement.save());
         res.json(measurement);
     } catch (err) {
         res.status(500).json({ error: 'Szerverhiba', details: err });

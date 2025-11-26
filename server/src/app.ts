@@ -39,9 +39,45 @@ const dbConnectionErrors = new Counter({
   help: 'Number of MongoDB connection errors',
 });
 
+const dbQueryDuration = new Histogram({
+  name: 'db_query_duration_seconds',
+  help: 'Duration of MongoDB queries in seconds',
+  labelNames: ['operation', 'collection'],
+  buckets: [0.001, 0.005, 0.01, 0.05, 0.1, 0.5, 1, 2, 5],
+});
+
+const dbQueriesTotal = new Counter({
+  name: 'db_queries_total',
+  help: 'Total number of MongoDB queries',
+  labelNames: ['operation', 'collection', 'status'],
+});
+
 register.registerMetric(httpRequestDuration);
 register.registerMetric(httpRequestTotal);
 register.registerMetric(dbConnectionErrors);
+register.registerMetric(dbQueryDuration);
+register.registerMetric(dbQueriesTotal);
+
+async function trackDbOperation<T>(
+  operation: string,
+  collection: string,
+  fn: () => Promise<T>
+): Promise<T> {
+  const startTime = process.hrtime();
+  try {
+    const result = await fn();
+    const [seconds, nanoseconds] = process.hrtime(startTime);
+    const duration = seconds + nanoseconds / 1e9;
+
+    dbQueryDuration.labels(operation, collection).observe(duration);
+    dbQueriesTotal.labels(operation, collection, 'success').inc();
+
+    return result;
+  } catch (err) {
+    dbQueriesTotal.labels(operation, collection, 'fail').inc();
+    throw err;
+  }
+}
 
 app.use((req, res, next) => {
   const startTime = process.hrtime();
@@ -92,3 +128,5 @@ mongoose.connect(process.env.ATLAS_URI || '', { dbName: 'healthcare_data_manager
 		console.error('MongoDB connection error:', err);
 		dbConnectionErrors.inc();
 	});
+	
+export { trackDbOperation };
