@@ -3,7 +3,7 @@ import Patient from '../models/Patient';
 import User from "../models/User";
 import Measurement from '../models/Measurement';
 import { AuthRequest, authenticate } from '../middleware/auth';
-import { trackDbOperation } from '../app';
+import { trackDbOperation } from '../metrics/dbMetrics';
 
 const router = express.Router();
 

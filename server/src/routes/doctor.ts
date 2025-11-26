@@ -1,6 +1,6 @@
 import express from 'express';
 import Doctor from '../models/Doctor';
-import { trackDbOperation } from '../app';
+import { trackDbOperation } from '../metrics/dbMetrics';
 
 const router = express.Router();
 

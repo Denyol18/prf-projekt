@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import Patient from '../models/Patient';
 import Doctor from "../models/Doctor";
-import { trackDbOperation } from '../app';
+import { trackDbOperation } from '../metrics/dbMetrics';
 
 const router = express.Router();
 

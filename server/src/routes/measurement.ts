@@ -2,7 +2,7 @@ import express from 'express';
 import Measurement from '../models/Measurement';
 import Patient from '../models/Patient';
 import { AuthRequest, authenticate } from '../middleware/auth';
-import { trackDbOperation } from '../app';
+import { trackDbOperation } from '../metrics/dbMetrics';
 
 const router = express.Router();
 
@@ -84,7 +84,7 @@ router.get('/doctor', authenticate, async (req: AuthRequest, res) => {
             return;
         }
 
-        const patientIds = patients.map(p => p._id);
+        const patientIds = patients.map((p: any) => p._id);
         const measurements = await trackDbOperation(
             'find',
             'measurements',
