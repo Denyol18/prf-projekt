@@ -58,13 +58,15 @@ app.use((req, res, next) => {
     httpRequestTotal
       .labels(req.method, req.path, res.statusCode.toString())
       .inc();
-	  
+	
 	logger.info("HTTP Request", {
-      method: req.method,
-	  path: req.path,
-      statusCode: res.statusCode,
-      duration: duration.toFixed(3) + "s",
-    });
+	  meta: [{ 
+		method: req.method, 
+		path: req.path, 
+		statusCode: res.statusCode, 
+		duration: duration.toFixed(3) + "s" 
+	  }],
+	});
   });
 
   next();
