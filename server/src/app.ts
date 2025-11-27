@@ -59,12 +59,7 @@ app.use((req, res, next) => {
       .labels(req.method, req.path, res.statusCode.toString())
       .inc();
 	
-	logger.info("HTTP Request", {
-	  _method: req.method,
-	  _path: req.path,
-	  _statusCode: res.statusCode,
-	  _duration: duration.toFixed(3) + "s",
-	});
+	logger.info("HTTP Request: { method: " + req.method + ", path: " + req.path + ", status: " + res.statusCode + ", duration: " + duration.toFixed(3) + "s }");
   });
 
   next();
