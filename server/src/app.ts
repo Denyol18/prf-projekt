@@ -60,12 +60,10 @@ app.use((req, res, next) => {
       .inc();
 	
 	logger.info("HTTP Request", {
-	  meta: [{ 
-		method: req.method, 
-		path: req.path, 
-		statusCode: res.statusCode, 
-		duration: duration.toFixed(3) + "s" 
-	  }],
+	  _method: req.method,
+	  _path: req.path,
+	  _statusCode: res.statusCode,
+	  _duration: duration.toFixed(3) + "s",
 	});
   });
 
